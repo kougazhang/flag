@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type sliceInt64Value []int64
@@ -57,54 +58,54 @@ func (s *sliceStrValue) Get() any { return []string(*s) }
 
 func (s *sliceStrValue) String() string { return fmt.Sprintf("%v", *s) }
 
-func SliceStrVar(p *[]string, name string, value []string, usage string) {
+func SliceStr(p *[]string, name string, value []string, usage string) {
 	flag.CommandLine.Var(newSliceStrValue(value, p), name, usage)
 }
 
-type iTime int64
+type iTime time.Time
 
-func (s *iTime) Get() any { return int64(*s) }
+func (s *iTime) Get() any { return time.Time(*s) }
 
 func (s *iTime) String() string { return fmt.Sprintf("%v", *s) }
 
 func (s *iTime) Set(val string) (err error) {
-	sec, err := parseTime(val)
+	tm, err := time.ParseInLocation("2006-01-02_15:04:05", val, time.Local)
 	if err != nil {
 		return err
 	}
-	*s = iTime(sec)
+	*s = iTime(tm)
 	return nil
 }
 
-func newTime(val int64, p *int64) *iTime {
+func newTime(val time.Time, p *time.Time) *iTime {
 	*p = val
 	return (*iTime)(p)
 }
 
-func Time(p *int64, name string, value int64, usage string) {
+func Time(p *time.Time, name string, value time.Time, usage string) {
 	flag.CommandLine.Var(newTime(value, p), name, usage)
 }
 
-type second int64
+type duration time.Duration
 
-func (c *second) Get() any { return int64(*c) }
+func (s *duration) Get() any { return time.Duration(*s) }
 
-func (c *second) String() string { return fmt.Sprintf("%v", *c) }
+func (s *duration) String() string { return fmt.Sprintf("%v", *s) }
 
-func (c *second) Set(s string) (err error) {
-	val, err := parseDuration(s)
+func (s *duration) Set(val string) (err error) {
+	tm, err := parseDuration(val)
 	if err != nil {
 		return err
 	}
-	*c = second(val.Seconds())
+	*s = duration(tm)
 	return nil
 }
 
-func newSecond(val int64, p *int64) *second {
+func newDuration(val time.Duration, p *time.Duration) *duration {
 	*p = val
-	return (*second)(p)
+	return (*duration)(p)
 }
 
-func Second(p *int64, name string, value int64, usage string) {
-	flag.CommandLine.Var(newSecond(value, p), name, usage)
+func Duration(p *time.Duration, name string, value time.Duration, usage string) {
+	flag.CommandLine.Var(newDuration(value, p), name, usage)
 }

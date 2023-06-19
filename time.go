@@ -2,37 +2,8 @@ package kit
 
 import (
 	"fmt"
-	"strconv"
 	"time"
 )
-
-func parseTime(val string) (int64, error) {
-	res, err := strconv.ParseInt(val, 10, 64)
-	if err == nil {
-		return res, nil
-	}
-
-	parts := []string{
-		"01",
-		"02",
-		"15",
-		"04",
-		"05",
-	}
-
-	layout := "2006"
-	var num int
-	for i := 4; i < len(val); i += 3 {
-		layout += string(val[i])
-		layout += parts[num]
-		num++
-	}
-	tm, err := time.ParseInLocation(layout, val, time.Local)
-	if err != nil {
-		return 0, err
-	}
-	return tm.Unix(), nil
-}
 
 func parseDuration(s string) (time.Duration, error) {
 	orig := s
