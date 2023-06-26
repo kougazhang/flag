@@ -109,3 +109,27 @@ func newDuration(val time.Duration, p *time.Duration) *duration {
 func Duration(p *time.Duration, name string, value time.Duration, usage string) {
 	flag.CommandLine.Var(newDuration(value, p), name, usage)
 }
+
+type date time.Time
+
+func (s *date) Get() any { return time.Time(*s) }
+
+func (s *date) String() string { return fmt.Sprintf("%v", *s) }
+
+func (s *date) Set(val string) (err error) {
+	tm, err := time.ParseInLocation("2006-01-02", val, time.Local)
+	if err != nil {
+		return err
+	}
+	*s = date(tm)
+	return nil
+}
+
+func newDate(val time.Time, p *time.Time) *date {
+	*p = val
+	return (*date)(p)
+}
+
+func Date(p *time.Time, name string, value time.Time, usage string) {
+	flag.CommandLine.Var(newDate(value, p), name, usage)
+}
